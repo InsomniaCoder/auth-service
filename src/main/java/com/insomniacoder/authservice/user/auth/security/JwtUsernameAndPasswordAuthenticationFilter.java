@@ -1,6 +1,7 @@
 package com.insomniacoder.authservice.user.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.insomniacoder.authservice.user.dto.CustomClaims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,9 +32,10 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     private final String BEARER_PREFIX = "Bearer ";
     private final String _secret = "JwtSecretKey";
 
-    private final int EXPIRATION_PERIOD = 24 * 60 * 60;
 
-    public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authManager) {
+    private final int EXPIRATION_PERIOD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+
+    JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authManager) {
 
         this.authManager = authManager;
         // By default, UsernamePasswordAuthenticationFilter listens to "/login" path.
@@ -41,6 +43,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(this.AUTH_URL, "POST"));
     }
 
+    //when receiving request
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
@@ -63,7 +66,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     // The 'auth' passed to successfulAuthentication() is the current authenticated user.
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException {
+                                            Authentication auth) {
 
         Long now = System.currentTimeMillis();
 
@@ -71,14 +74,24 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .setSubject(auth.getName())
                 // Convert to list of strings.
                 // This is important because it affects the way we get them back in the Gateway.
+                // able to add more claims
                 .claim("authorities", auth.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .claim("xom-custom-claims", new CustomClaims("APTLOKEJA"))
                 .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + EXPIRATION_PERIOD * 1000))  // in milliseconds
+                .setExpiration(new Date(now + EXPIRATION_PERIOD))
                 .signWith(SignatureAlgorithm.HS512, _secret.getBytes())
                 .compact();
         // Add token to header
         response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + token);
+    }
+
+
+    //Can override to handle unsuccessful authentication
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.addHeader(AUTHORIZATION_HEADER,"User not found...");
+        super.unsuccessfulAuthentication(request, response, failed);
     }
 
     // A (temporary) class just to represent the user credentials

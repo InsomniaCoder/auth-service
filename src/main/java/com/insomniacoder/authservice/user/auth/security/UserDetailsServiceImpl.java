@@ -30,6 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (appUser != null) {
 
             List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                    //Spring security must have ROLE_
                     .commaSeparatedStringToAuthorityList("ROLE_" + appUser.getRole());
             return new User(
                     appUser.getEmail(),
