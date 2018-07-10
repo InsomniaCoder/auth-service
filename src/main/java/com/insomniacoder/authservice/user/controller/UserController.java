@@ -7,7 +7,8 @@ import com.insomniacoder.authservice.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(value = "/user")
+@RestController
+@RequestMapping(value = "user")
 public class UserController {
 
     private final UserRepository userRepository;
