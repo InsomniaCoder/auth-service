@@ -1,4 +1,4 @@
-package com.insomniacoder.authservice.user.entitie;
+package com.insomniacoder.authservice.user.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

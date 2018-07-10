@@ -8,7 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class CreateUserDTO {
+public class UserDTO {
 
     @NotNull
     @Email(message = "Email should be valid")
