@@ -77,7 +77,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 // able to add more claims
                 .claim("authorities", auth.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                .claim("xom-custom-claims", new CustomClaims("APTLOKEJA"))
+//                .claim("xom-custom-claims", new CustomClaims("APTLOKEJA"))
+                .claim("xom-custom-claims", "xxxxxxx")
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + EXPIRATION_PERIOD))
                 .signWith(SignatureAlgorithm.HS512, _secret.getBytes())
